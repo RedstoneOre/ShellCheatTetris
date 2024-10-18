@@ -180,7 +180,6 @@ false && {
 	stty echo
 }
 
-
 #Ignore
 function Read_Ignore {
 	read -N 99999 -t 0.001
