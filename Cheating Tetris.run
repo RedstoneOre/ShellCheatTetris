@@ -1,0 +1,33 @@
+#! /bin/bash
+
+#The game executeable File
+
+GoOn=1
+ProcArgs=( "$@" )
+
+ProcPos="$(realpath "$0")"
+ProcPos="${ProcPos%\/*}"
+
+#Show Error
+function serr {
+	echo '[0;0H[5TTHE PROGRAM HAD A PROBLEM WITH RETURN VALUE '"$1"'!'
+	stty "$TtyAttr"
+	read -N 1
+	. "$ProcPos"'/report.sh'
+	exit "$1"
+}
+
+while [ "$GoOn" == 1 ];do
+	GoOn=0
+	. "$ProcPos"'/game.sh' -c "${ProcArgs[@]}";
+	case "$?" in
+		0) exit ;;
+		1) exit 2;;
+		2) exit 3;;
+		3) echo 'Open File,This will disable ALL ARGUMENTS when game start'
+			unset ProcArgs
+			read -re -i "$HOME"'/' ProcArgs[0]
+			GoOn=1 ;;
+		*) serr "$?";;
+	esac
+done

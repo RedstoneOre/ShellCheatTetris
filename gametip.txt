@@ -1,0 +1,20 @@
+Welcome to cheating tetris
+Version: ###
+Control
+	Press a(left arrow),d(right arrow) to move left or right
+	Press w(up arrow) to rotate anticlockwise
+		to the first avalible rotation
+	Hold s(down arrow) to make the block drop faster
+Game
+	Press q to save and quit
+	Ignore(Ctrl-c) to save and quit
+	Press Ctrl-s to save
+	Press f or Alt-Ctrl-s to input file path and save in the file
+	Add a path argument or use Ctrl-O to open a save
+	Press u or Ctrl-r or F5 to refresh the map
+Cheat
+	Press 1 to destroy blocks while dropping and
+		disapper when touch the ground
+		(cooldown 20 blocks,use (GameHeight/2) scores)
+	Press 2 to send the block back to the spawn
+		(cooldown 10 blocks,Use (GameHeight/5) scores)
