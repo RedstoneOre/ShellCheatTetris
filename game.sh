@@ -1,29 +1,20 @@
-ver='CHEAT-TETRIS alpha-2.1 N.5'
+#Get Path
+GameDir="$(realpath "$0")"
+GameDir="${GameDir%\/*}"
 
-#Config
-x=15 y=20 sp=6
-colors=('0' '101' '102' '103' '104' '105' '106' '107')
-shapes=(
-	'0,11111,11111,11111,11111,11111'
-	'0,11,11'
-	'0,010,111 0,01,11,01 0,000,111,010 1,010,011,010'
-	'1,01,01,01,01 0,0000,1111'
-	'0,110,011 0,01,11,10'
-	'0,011,110 0,10,11,01'
-	'0,10,10,11 0,001,111 0,11,01,01 0,111,100',
-	'0,11,10,10 0,111,001 0,01,01,11 0,100,111'
-)
-blockChars='.!@'
-spd=10
-[ "$1" == -c ] && {
-	GameTipTxt="$(<gametip.txt)"
-	echo "${GameTipTxt//###/$ver}"
-}
+#Init Cheating
 CheatBreakTime=0 CheatSendBackTime=0
 CheatBreak=0     CheatSendBack=0
 
 #Including
-. './read.sh' # Reading and Autocomplete
+. "$GameDir"'/config.sh' "$GameDir"'/config' # Config
+. "$GameDir"'/read.sh' # Reading and Autocomplete
+
+ver='CHEAT-TETRIS alpha-2.1 N.5'
+[ "$1" == -c ] && [ "$TipFile" != '' ] && {
+	GameTipTxt="$(<"$GameDir"'/'"$TipFile")"
+	echo "${GameTipTxt//###/$ver}"
+}
 
 #Connect strings
 function connect {
@@ -58,13 +49,14 @@ function tip {
 function rb {
 	rs
 	RenderWide="$[x*2]"
+	BorderChar="${blockChars[3]}"
 	for((i=1;i<=y;++i));do
-		echo '#['"$RenderWide"'C#'
+		echo "$BorderChar"'['"$RenderWide"'C'"$BorderChar"
 	done
 	for((i=1;i<=x;++i));do
-		echo -n '# '
+		echo -n "$BorderChar"' '
 	done
-	echo -n '##'
+	echo -n "$BorderChar$BorderChar"
 }
 #Render Next Tip
 function rnxt {
@@ -129,7 +121,7 @@ function blockInGround {
 }
 function blockUpdate {
 	updBlockColor='['"${colors[$2]}"';'"$[$2?30:0]"'m'
-	updBlockChar="${blockChars:$[$2?1:0]:1}"
+	updBlockChar="${blockChars[$2?1:0]}"
 	updBlockShapes=(${shapes[$1]})
 	updBlockShape=(${updBlockShapes[$3]//,/ })
 	updBlockOffset="${updBlockShape[0]}"
@@ -161,7 +153,7 @@ function blockUpdate {
 function ClearMap {
 	tmp=()
 	for((cmi=0;cmi<x;++cmi));do
-		tmp[cmi]="${blockChars:0:1}"' '
+		tmp[cmi]="${blockChars[0]}"' '
 	done
 	tmp="$(connect "${tmp[@]}")"
 	for((cmi=1;cmi<=y;++cmi));do
@@ -178,8 +170,8 @@ function PrintMap {
 				echo -n '[2C'
 			else
 				printColor="$[printColor*$1]"
-				printChar="${blockChars:2}"
-				[ "$printColor" == 0 ] && printChar="${blockChars:0:1}"
+				printChar="${blockChars[2]}"
+				[ "$printColor" == 0 ] && printChar="${blockChars[0]}"
 				echo -n '['"${colors[printColor]}"';'"$[$printColor?30:0]"'m'"$printChar"' '
 			fi
 		done

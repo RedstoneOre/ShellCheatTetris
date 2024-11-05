@@ -6,19 +6,19 @@
 > 
 > Please run the follow commands in the game folder:
 > ```sh
-> chmod +x ./tetris
+> chmod +x './Cheat Tetris.run'
 > ```
 
 > Executing:
 > 
 > Please run the follow commands in the game folder:
 > ```sh
-> ./tetris [save-path]
+> './Cheat Tetris.run' [save-path]
 > ```
 
 #### Require
 + A console with enough columns and lines
-+ Installed `bash`
++ Installed `bash`,`date`
 
 ## Gameplay
 The following text will show you **when you start a game**,
@@ -30,17 +30,19 @@ Control
 		to the first avalible rotation
 	Hold s(down arrow) to make the block drop faster
 Game
-	Press q or Ignore(Ctrl-c) to save and quit
+	Press q to save and quit
+	Ignore(Ctrl-c) to save and quit
 	Press Ctrl-s to save
 	Press f or Alt-Ctrl-s to input file path and save in the file
 	Add a path argument or use Ctrl-O to open a save
 	Press u or Ctrl-r or F5 to refresh the map
 Cheat
 	Press 1 to destroy blocks while dropping and
-		disapper when touch the ground(cooldown 20 blocks)
-	Press 2 to send the block back to the spawn (cooldown 10 blocks)
+		disapper when touch the ground
+		(cooldown 20 blocks,use (GameHeight/2) scores)
+	Press 2 to send the block back to the spawn
+		(cooldown 10 blocks,Use (GameHeight/5) scores)
 ```
-> CHEATING WILL USE YOUR SCORE!*(but it didn't show)*
 
 #### Scores
 1. Clear a line: $+{GameWidth}$
@@ -57,6 +59,20 @@ $$TickDelay=\frac { \Big \{ \begin{matrix} 1s(SpeedDrop \  on) \\ 3s(SpeedDrop \
 1. Placing:When a falling block touch the ground,it will been placed in next tick
 2. Clearing:When a line is **been filled by placed blocks**,the line will **been cleared** and
 	the lines up will **drop down**.
+
+#### Inputing
+You need to input something in the game,and you can input like this:
+> Press `Insert` to insert special chars
+> Press `Tab` to trig `Autocomplete`
+> Press `Enter` to confirm
+> In `Autocomplete`:
+>> Press `Tab` to show next choice
+>> Press `Shift-Tab` to show prev choice
+>> Press `Ctrl-H` to return to the first choice
+>> Press `Espace` to espace `Autocomplete`
+>> Press `Enter` to confirm
+>> Press *another key* to show the option which 
+>>  first letter is that the given key inputted
 
 ## Display
 | Object       | Char | Width | 
