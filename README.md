@@ -20,6 +20,9 @@
 + A console with enough columns and lines
 + Installed `bash`,`date` and `python3`
 
+#### Save Upgrading
+> See `UPGRADE.md`
+
 ## Gameplay
 The following text will show you **when you start a game**,
 and it shows the **keys and arguments**.
