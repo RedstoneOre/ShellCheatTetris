@@ -18,7 +18,7 @@
 
 #### Require
 + A console with enough columns and lines
-+ Installed `bash`,`date`
++ Installed `bash`,`date` and `python3`
 
 ## Gameplay
 The following text will show you **when you start a game**,
