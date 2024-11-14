@@ -7,7 +7,6 @@ Control
 	Hold s(down arrow) to make the block drop faster
 Game
 	Press q to save and quit
-	Ignore(Ctrl-c) to save and quit
 	Press Ctrl-s to save
 	Press f or Alt-Ctrl-s to input file path and save in the file
 	Add a path argument or use Ctrl-O to open a save

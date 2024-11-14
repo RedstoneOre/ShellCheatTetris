@@ -1,6 +1,12 @@
+#Exiting
+function Exit {
+	GameRetVal="${1:-0}"
+	true
+}
 #Get Path
 GameDir="$(realpath "$0")"
 GameDir="${GameDir%\/*}"
+[ "$GameDir" == '' ] && Exit 13 || {
 
 #Init Cheating
 CheatBreakTime=0 CheatSendBackTime=0
@@ -9,12 +15,15 @@ CheatBreak=0     CheatSendBack=0
 #Including
 . "$GameDir"'/config.sh' "$GameDir"'/config' # Config
 . "$GameDir"'/read.sh' # Reading and Autocomplete
+. "$GameDir"'/read_saveformat.sh' # Saving and Reading save
 
-ver='CHEAT-TETRIS alpha-2.1 N.5'
+ver='CHEAT-TETRIS alpha-2.2 N.6'
 [ "$1" == -c ] && [ "$TipFile" != '' ] && {
 	GameTipTxt="$(<"$GameDir"'/'"$TipFile")"
 	echo "${GameTipTxt//###/$ver}"
 }
+Read_Saveformat_Init "$ExecuteAblePath"
+Read_Saveformat_Read "$GameDir"'/saveformat.dat'
 
 #Connect strings
 function connect {
@@ -23,6 +32,11 @@ function connect {
 	done
 }
 
+#Echo Without Options
+function OEcho {
+	echo -n "$*"'
+'
+}
 #Clear
 function rs {
 	clear
@@ -285,7 +299,9 @@ function drop {
 }
 
 function _Read {
-	read
+	for((_Read_i=0;_Read_i<Saveformat_Lines;++_Read_i));do
+		read
+	done
 	read _readVer
 	[ "$_readVer" != "$ver" ] && return 1
 	read x y sc NowBlockCnt
@@ -300,13 +316,14 @@ function load {
 	return "$?"
 }
 function _Write {
-	echo '#! '"$(realpath "$0")"
-	echo "$ver"
-	echo "$x $y $sc $NowBlockCnt"
-	echo "${map[*]}"
-	echo "${nowBlock[*]} ${nowPos[*]} ${nextBlock[*]} ${nextPos[*]}"
-	echo "$CheatBreak $CheatBreakTime"
-	echo "$CheatSendBack $CheatSendBackTime"
+	OEcho "$Saveformat_Head"
+	OEcho "$ver"
+	OEcho "$x $y $sc $NowBlockCnt"
+	OEcho "${map[*]}"
+	OEcho "${nowBlock[*]} ${nowPos[*]} ${nextBlock[*]} ${nextPos[*]}"
+	OEcho "$CheatBreak $CheatBreakTime"
+	OEcho "$CheatSendBack $CheatSendBackTime"
+	OEcho "$Saveformat_Tail"
 }
 function save {
 	saveR="${2:-1}"
@@ -456,7 +473,7 @@ function updMap {
 }
 
 #Main
-trap 'askq && endp' SIGINT
+trap '' SIGINT
 {
 	File="$2"
 	init
@@ -533,4 +550,7 @@ trap 'askq && endp' SIGINT
 	done
 	endp
 }
+
+} # GameDir
+
 return "$?"

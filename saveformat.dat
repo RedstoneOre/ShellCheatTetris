@@ -1,0 +1,8 @@
+6
+#! /bin/python3
+import subprocess
+import os
+PathStr=#Path_s
+subprocess.call([PathStr, os.path.realpath(__file__)])
+'''
+'''

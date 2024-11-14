@@ -2,11 +2,12 @@
 
 #The game executeable File
 
+TtyAttr="$(stty -g)"
 GoOn=1
 ProcArgs=( "$@" )
 
-ProcPos="$(realpath "$0")"
-ProcPos="${ProcPos%\/*}"
+ExecuteAblePath="$(realpath "$0")"
+ProcPos="${ExecuteAblePath%\/*}"
 
 #Show Error
 function serr {
@@ -19,15 +20,17 @@ function serr {
 
 while [ "$GoOn" == 1 ];do
 	GoOn=0
+	GameRetVal=0
 	. "$ProcPos"'/game.sh' -c "${ProcArgs[@]}";
-	case "$?" in
+	case "$GameRetVal" in
 		0) exit ;;
 		1) exit 2;;
-		2) exit 3;;
+		2) bash -t;;
 		3) echo 'Open File,This will disable ALL ARGUMENTS when game start'
 			unset ProcArgs
 			read -re -i "$HOME"'/' ProcArgs[0]
 			GoOn=1 ;;
-		*) serr "$?";;
+		13) echo 'The game loaded fail because of empty $GameDir,just try to run this again';;
+		*) serr "$GameRetVal";;
 	esac
 done
