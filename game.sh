@@ -1,3 +1,5 @@
+#! /bin/bash
+
 #Exiting
 function Exit {
 	GameRetVal="${1:-0}"
@@ -40,7 +42,7 @@ function OEcho {
 #Clear
 function rs {
 	clear
-	echo -n 'c[0;0H'
+	echo -n $'\e''c[0;0H'
 }
 #Get Timestamp
 function ts {
@@ -54,7 +56,7 @@ function resSleep {
 
 #Show Tip
 function tip {
-	[ "$PrintFlag" != 1 ] && echo -n '[0m['"$[y+2]"';2H'
+	[ "$PrintFlag" != 1 ] && echo -n $'\e''[0m['"$[y+2]"';2H'
 	echo -n "$1"
 	PrintFlag=1
 }
@@ -65,7 +67,7 @@ function rb {
 	RenderWide="$[x*2]"
 	BorderChar="${blockChars[3]}"
 	for((i=1;i<=y;++i));do
-		echo "$BorderChar"'['"$RenderWide"'C'"$BorderChar"
+		echo "$BorderChar"$'\e''['"$RenderWide"'C'"$BorderChar"
 	done
 	for((i=1;i<=x;++i));do
 		echo -n "$BorderChar"' '
@@ -74,7 +76,7 @@ function rb {
 }
 #Render Next Tip
 function rnxt {
-	echo -n '[7;'"$[2*x+4]"'HNext: [6n'
+	echo -n $'\e''[7;'"$[2*x+4]"'HNext: [6n'
 	read -r -d '[' tmp
 	read -r -d ';' nxtShowPos[0]
 	read -r -d 'R' nxtShowPos[1]
@@ -94,13 +96,13 @@ function ReadLine {
 #Score
 sc=0 tm="$(ts)"
 function scinit {
-	echo -n '[3;'"$[2*x+4]"'HScore: [6n'
+	echo -n $'\e''[3;'"$[2*x+4]"'HScore: [6n'
 	read -r -d 'R' scShowPos
 	scShowPos="${scShowPos}H"
 }
 function scupd {
 	sc="$1"
-	echo -n '[0m'"$scShowPos$sc"
+	echo -n $'\e''[0m'"$scShowPos$sc"
 }
 
 #During
@@ -134,7 +136,7 @@ function blockInGround {
 	return 1
 }
 function blockUpdate {
-	updBlockColor='['"${colors[$2]}"';'"$[$2?30:0]"'m'
+	updBlockColor=$'\e''['"${colors[$2]}"';'"$[$2?30:0]"'m'
 	updBlockChar="${blockChars[$2?1:0]}"
 	updBlockShapes=(${shapes[$1]})
 	updBlockShape=(${updBlockShapes[$3]//,/ })
@@ -147,20 +149,20 @@ function blockUpdate {
 		updBlockStuckTag=1
 		[ "$6" != 1 ] && return 1
 	}
-	echo -n "$updBlockColor"'['"$4;$[updBlockTpColumn*2]"'H'
+	echo -n "$updBlockColor"$'\e''['"$4;$[updBlockTpColumn*2]"'H'
 	for((bri=1;bri<${#updBlockShape[@]};++bri));do
 		tmp="${updBlockShape[bri]}"
 		for((brj=updBlockOffset;brj<${#tmp};++brj));do
 			if [ "${tmp:$brj:1}" == 1 ];then
 				echo -n "$updBlockChar"' '
 			else
-				echo -n '[2C'
+				echo -n $'\e''[2C'
 			fi
 		done
-		echo -n '['"$[(${#tmp}-updBlockOffset)*2]"'D[B'
+		echo -n $'\e''['"$[(${#tmp}-updBlockOffset)*2]"'D[B'
 	done
-	echo -n '[0m['"${#updBlockShape[@]}"'A'
-	[ "$updBlockOffset" -gt 0 ] && echo -n '['"$updBlockOffset"'D'
+	echo -n $'\e''[0m['"${#updBlockShape[@]}"'A'
+	[ "$updBlockOffset" -gt 0 ] && echo -n $'\e''['"$updBlockOffset"'D'
 	return "$updBlockStuckTag"
 }
 # Map
@@ -171,22 +173,22 @@ function ClearMap {
 	done
 	tmp="$(connect "${tmp[@]}")"
 	for((cmi=1;cmi<=y;++cmi));do
-		echo -n '['"$cmi"';2H'"$tmp"
+		echo -n $'\e''['"$cmi"';2H'"$tmp"
 	done
 }
 function PrintMap {
 	for((pmi=$2;pmi<=$3;++pmi));do
-		echo -n '['"$pmi"';2H'
+		echo -n $'\e''['"$pmi"';2H'
 		tmp="${map[$pmi]}"
 		for((pmj=0;pmj<x;++pmj));do
 			printColor="${tmp:$pmj:1}"
 			if [ "$printColor" == 0 ];then
-				echo -n '[2C'
+				echo -n $'\e''[2C'
 			else
 				printColor="$[printColor*$1]"
 				printChar="${blockChars[2]}"
 				[ "$printColor" == 0 ] && printChar="${blockChars[0]}"
-				echo -n '['"${colors[printColor]}"';'"$[$printColor?30:0]"'m'"$printChar"' '
+				echo -n $'\e''['"${colors[printColor]}"';'"$[$printColor?30:0]"'m'"$printChar"' '
 			fi
 		done
 	done
@@ -242,14 +244,14 @@ function NewBlock {
 		nextBlock[2]="$[RANDOM%${#nextBlockRotations[@]}]"
 		nextPos=(0 "$sp")
 		blockInGround "${nowBlock[@]}" "${nowPos[@]}" && {
-			echo -n '[0m['"$[y+3]"';3HGAME OVER!'
+			echo -n $'\e''[0m['"$[y+3]"';3HGAME OVER!'
 			read -t 3;read -N 1
 			endp
 		}
 	}
 	blockUpdate 0 0 0 "${nxtShowPos[@]}" 1
 	blockUpdate "${nextBlock[@]}" "${nxtShowPos[@]}" 1
-	echo -en 'ANo.'"$[NowBlockCnt+1]"' Code: '"${nextBlock[*]}"
+	echo -en $'\e''ANo.'"$[NowBlockCnt+1]"' Code: '"${nextBlock[*]}"
 }
 # Control
 function move {
@@ -329,47 +331,49 @@ function save {
 	saveR="${2:-1}"
 	saveFile="$1"
 	while [ "$saveR" -gt 0 ] ;do
-		echo '[0m['"$[y+3]"';2HSave File:Input File Name'"$saveR"
+		echo $'\e''[0m['"$[y+3]"';2HSave File:Input File Name'"$saveR"
 		Read_Read Read_File
-		echo -n '[0m['"$[y+4]"';0H[K'
+		echo -n $'\e''[0m['"$[y+4]"';0H[K'
 		saveFile="$Read_Result"
-		echo -n '[2147483647A[0m['"$[y+3]"';0H[K'
+		echo -n $'\e''[2147483647A[0m['"$[y+3]"';0H[K'
 		resSleep
 		[ "$saveFile" == '' ] && return 1
 		saveR="$[saveR-1]"
 	done
 	[ "$saveFile" == '' ] && {
-		echo -n '[0m['"$[y+3]"';2HFailed:Not Opened[K'
+		echo -n $'\e''[0m['"$[y+3]"';2HFailed:Not Opened[K'
 		read -N 1
-		echo -n '[0m['"$[y+3]"';0H[K'
+		echo -n $'\e''[0m['"$[y+3]"';0H[K'
 		resSleep
 	       	return 1
 	}
 	[ -e "$saveFile" ] && {
 	       	[ -f "$saveFile" ] && {
-			echo -n '[0m['"$[y+3]"';2HWarning:Trying to save in a file not opened( Yes:[yYaA1] / No:(other) )[K'
-			read -N 1 saveOp
-			[[ "$saveOp" == [yYaA1] ]] || {
-				resSleep
-				echo -n '[0m['"$[y+3]"';0H[K'
-				return 2
+			[ "$File" != "$saveFile" ] && {
+				echo -n $'\e''[0m['"$[y+3]"';2HWarning:Trying to save in a file not opened( Yes:[yYaA1] / No:(other) )[K'
+				read -N 1 saveOp
+				[[ "$saveOp" == [yYaA1] ]] || {
+					resSleep
+					echo -n $'\e''[0m['"$[y+3]"';0H[K'
+					return 2
+				}
 			}
 			true
 		} || {
-			echo -n '[0m['"$[y+3]"';2HFailed:Not a file[K'
+			echo -n $'\e''[0m['"$[y+3]"';2HFailed:Not a file[K'
 			read -N 1
-			echo -n '[0m['"$[y+3]"';0H[K'
+			echo -n $'\e''[0m['"$[y+3]"';0H[K'
 			resSleep
 			return 1
 		}
 	}
 	File="$saveFile"
-	echo -n '[0m['"$[y+3]"';2HSaving File...[K'
+	echo -n $'\e''[0m['"$[y+3]"';2HSaving File...[K'
 	_Write > "$File"
 	chmod +x "$File"
 	echo -n 'File Saved:'"$File"
 	read -N 1
-	echo -n '[0m['"$[y+3]"';0H[K'
+	echo -n $'\e''[0m['"$[y+3]"';0H[K'
 	resSleep
 }
 
@@ -409,7 +413,7 @@ function init {
 			read -N 1
 		else
 			read -re -p 'Input Speed: ' -i "$spd" spd
-			echo -n '[?25l'
+			echo -n $'\e''[?25l'
 			stty -icanon -echo -ixon
 			initmap 0
 			rb;ClearMap;rnxt;scinit
@@ -420,7 +424,7 @@ function init {
 			tip 'Loaded,Press any key to start'
 			PrintFlag=0
 			read -N 1
-			echo -n '[0m['"$[y+2]"';0H[K'
+			echo -n $'\e''[0m['"$[y+2]"';0H[K'
 			UseFileFlag=1
 		fi
 	}
@@ -429,7 +433,7 @@ function init {
 		read -re -p 'Input Y: ' -i "$y" y
 		read -re -p 'Input Speed: ' -i "$spd" spd
 		stty -icanon -echo -ixon
-		echo -n '[?25l'
+		echo -n $'\e''[?25l'
 		rb;ClearMap;rnxt;scinit
 		scupd 0
 		sp="$[x/2-1]"
@@ -445,22 +449,26 @@ function endp {
 	rs
 	read -t 0.1
 	stty "$TtyAttr"
-	echo '[?25hYou got '"$sc"' score(s)!'
+	echo $'\e''[?25hYou got '"$sc"' score(s)!'
 	exit $1
 }
 
 #Action:Pause
 function pause {
-	echo -n '[0m['"$[y+2]"';2HPaused,press any key to continue.'
+	echo -n $'\e''[0m['"$[y+2]"';2HPaused,press any key to continue.'
 	read -N 1
-	echo -n '[0m['"$[y+2]"';0H[K'
+	echo -n $'\e''[0m['"$[y+2]"';0H[K'
 	resSleep
 }
 #Action:Quit
 function askq {
-	echo -n '[0m['"$[y+3]"';2HTo quit,press y/To save&quit,press s'
+	echo -n $'\e''[0m['"$[y+3]"';2HTo quit,press y/END ,  To save&quit,press s'
 	read -N 1 op
-	echo -n '[0m['"$[y+3]"';0H[K'
+	[ "$op" == $'\e' ] && {
+		read -N 2 -t 0.05 op
+		[ "$op" == '[F' ] && op=y;
+	}
+	echo -n $'\e''[0m['"$[y+3]"';0H[K'
 	[[ "$op" == [sS] ]] && save && return
 	[[ "$op" == [yY] ]] && return
 	resSleep
@@ -473,7 +481,8 @@ function updMap {
 }
 
 #Main
-trap '' SIGINT
+scexit=0
+trap 'schexit=1' SIGINT
 {
 	File="$2"
 	init
@@ -482,13 +491,13 @@ trap '' SIGINT
 		op=''
 		read -N 1 -t 0.029 op
 		[ "$PrintFlag" == 1 ] && {
-			echo -n '[0m['"$[y+2]"';0H[K'
+			echo -n $'\e''[0m['"$[y+2]"';0H[K'
 			PrintFlag=0
 		}
 		[ "$op" == '	' ] && {
 			keySwitchKey=(  'w'         'a'         's'         'd'          'f'       ''   ''   'q'    'p'     'u'         '1'              '2' )
 			Read_AcReq=( 'rotation' 'move.left' 'speed_drop' 'move.right' 'save.as' 'save' 'open' 'quit' 'pause' 'update_map' 'cheat.breaking' 'cheat.send_back')
-			echo -n '[0m['"$[y+3]"';0H[K'
+			echo -n $'\e''[0m['"$[y+3]"';0H[K'
 			Read_Autocomplete Read_None
 			for((Maini=0;Maini<${#keySwitchKey[@]};++Maini));do
 				[ "$Read_ComRes" == "${Read_AcReq[Maini]}" ] && {
@@ -497,7 +506,7 @@ trap '' SIGINT
 				}
 			done
 			resSleep
-			echo -n '[0m['"$[y+3]"';0H[K'
+			echo -n $'\e''[0m['"$[y+3]"';0H[K'
 		}
 		case "$op" in
 			'') Read_Ignore;;
@@ -505,15 +514,15 @@ trap '' SIGINT
 			[aA]) Read_Ignore;move -1 ;;
 			[sS]) Read_Ignore;speedDrop=1 ;;
 			[dD]) Read_Ignore;move 1 ;;
-			[qQ]) Read_Ignore;askq && break ;;
+			[qQ$'\27']) Read_Ignore;askq && break ;;
 			[pP]) Read_Ignore;pause ;;
-			[uU]) Read_Ignore;updMap ;;
-			'') Read_Ignore;save "$File" 0 ;;
-			'') Read_Ignore;askq && endp 3 ;;
+			[uU$'\22']) Read_Ignore;updMap ;;
+			$'\23') Read_Ignore;save "$File" 0 ;;
+			$'\17') Read_Ignore;askq && endp 3 ;;
 			f) Read_Ignore;save "$File";;
 			1) Read_Ignore;CheatCheck "$CheatBreakTime" 20 && { CheatBreak=1; CheatBreakTime="$NowBlockCnt"; scupd "$[sc-(y/2)]"; true; } || CheatPrint 'Break' "$CheatBreakTime" 20 ;;
 			2) Read_Ignore;CheatCheck "$CheatSendBackTime" 5 && { CheatSendBack=5; CheatSendBackTime="$NowBlockCnt"; scupd "$[sc-(y/5)]"; true; } || CheatPrint 'SendingBack' "$CheatSendBackTime" 5 ;;
-			'') read -N 1 -t 0.05 op
+			$'\e') read -N 1 -t 0.05 op
 				case "$op" in
 					\[) read -N 1 -t 0.05 op
 						case "$op" in
@@ -526,7 +535,8 @@ trap '' SIGINT
 						'') Read_Ignore;askq && break ;;
 						*) Read_Ignore;;
 					esac ;;
-					'') Read_Ignore;save "$File" ;;
+					$'\23') Read_Ignore;save "$File" ;;
+					'') Read_Ignore;askq && break ;;
 					*) Read_Ignore;;
 				esac;;
 			*) Read_Ignore;;
@@ -542,9 +552,13 @@ trap '' SIGINT
 		[ "$CheatBreak" == 1 ] && CheatStr[1]='Break,'
 		[ "$CheatSendBack" -gt 0 ] && CheatStr[2]='SendingBack,'
 		[ "${#CheatStr[@]}" -gt 1 ] && {
-			[ "$PrintFlag" == 0 ] && echo -n '[0m['"$[y+2]"';2H'
+			[ "$PrintFlag" == 0 ] && echo -n $'\e''[0m['"$[y+2]"';2H'
 			CheatStr="$(connect "${CheatStr[@]}")"
 			echo -n "${CheatStr:0:0-1}"
+		}
+		[ "$schexit" == 1 ] && {
+			schexit=0
+			askq && break
 		}
 		sleep "$[speedDrop?(100/spd):(300/spd)]" drop
 	done
