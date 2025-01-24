@@ -19,7 +19,7 @@ CheatBreak=0     CheatSendBack=0
 . "$GameDir"'/read.sh' # Reading and Autocomplete
 . "$GameDir"'/read_saveformat.sh' # Saving and Reading save
 
-ver='CHEAT-TETRIS alpha-2.2 N.6'
+ver='CHEAT-TETRIS beta-1.0 N.7'
 [ "$1" == -c ] && [ "$TipFile" != '' ] && {
 	GameTipTxt="$(<"$GameDir"'/'"$TipFile")"
 	echo "${GameTipTxt//###/$ver}"
